@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Smart Controller V3</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="led">LED</string>
+    <string name="light">Light</string>
+    <string name="waterHeater">Heater</string>
+    <string name="waterController">Pump</string>
+    <string name="other">Other</string>
+
+
+    <string-array name="PowerButtonActions">
+        <item>No action</item>
+        <item>Change state all devices</item>
+        <item>TurnOff all devices</item>
+        <item>TurnOn all devices</item>
+
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

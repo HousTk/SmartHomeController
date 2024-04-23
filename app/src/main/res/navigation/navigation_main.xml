@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main"
+    app:startDestination="@id/createFirstAddressFragment">
+
+    <fragment
+        android:id="@+id/devicesFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.devices.DevicesFragment"
+        android:label="fragment_devices"
+        tools:layout="@layout/fragment_devices"/>
+    <fragment
+        android:id="@+id/addRoomFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.addRoom.AddRoomFragment"
+        android:label="fragment_add_room"
+        tools:layout="@layout/fragment_add_room" />
+    <fragment
+        android:id="@+id/addNewDeviceFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.addDevice.AddNewDeviceFragment"
+        android:label="fragment_add_new_device"
+        tools:layout="@layout/fragment_add_new_device" />
+    <fragment
+        android:id="@+id/addressesFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.addresses.AddressesFragment"
+        android:label="fragment_addresses"
+        tools:layout="@layout/fragment_addresses" >
+        <action
+            android:id="@+id/action_addressesFragment_to_addAddressFragment"
+            app:destination="@id/addAddressFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createFirstAddressFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.logIn.CreateFirstAddressFragment"
+        android:label="fragment_create_first_address"
+        tools:layout="@layout/fragment_create_first_address">
+        <action
+            android:id="@+id/action_createFirstAddressFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_devicesFragment"
+            app:destination="@id/devicesFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_addRoomFragment"
+            app:destination="@id/addRoomFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_addressesFragment"
+            app:destination="@id/addressesFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_deviceFragment"
+            app:destination="@id/deviceFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_addDeviceToRoomFirstPageFragment"
+            app:destination="@id/addDeviceToRoomFirstPageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addAddressFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.addAddress.AddAddressFragment"
+        android:label="fragment_add_address"
+        tools:layout="@layout/fragment_add_address" />
+    <fragment
+        android:id="@+id/deviceFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.device.DeviceFragment"
+        android:label="fragment_device"
+        tools:layout="@layout/fragment_device" />
+    <fragment
+        android:id="@+id/addDeviceToRoomFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.addDeviceToRoom.AddDeviceToRoomFragment"
+        android:label="fragment_add_device_to_room"
+        tools:layout="@layout/fragment_add_device_to_room" />
+    <fragment
+        android:id="@+id/addDeviceToRoomFirstPageFragment"
+        android:name="com.example.smartcontrollerv3.main.presentation.addDeviceToRoom.AddDeviceToRoomFirstPageFragment"
+        android:label="fragment_add_device_to_room_first_page"
+        tools:layout="@layout/fragment_add_device_to_room_first_page" >
+        <action
+            android:id="@+id/action_addDeviceToRoomFirstPageFragment_to_addDeviceToRoomFragment"
+            app:destination="@id/addDeviceToRoomFragment" />
+        <action
+            android:id="@+id/action_addDeviceToRoomFirstPageFragment_to_addNewDeviceFragment"
+            app:destination="@id/addNewDeviceFragment" />
+    </fragment>
+</navigation>

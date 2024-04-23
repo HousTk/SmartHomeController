@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".main.presentation.addDeviceToRoom.AddDeviceToRoomFirstPageFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fragmentAddDeviceToRoomFirstPageText1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:text="Добавление устройства в комнату"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/fragmentAddDeviceToRoomFirstPageText2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:text="Добавить подключенное устройство"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/fragmentAddDeviceToRoomFirstPageAddDeviceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Добавить подключенное устройство" />
+
+        <TextView
+            android:id="@+id/fragmentAddDeviceToRoomFirstPageText3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:text="Добавить новое устройство"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/fragmentAddDeviceToRoomFirstPageAddNewDeviceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Добавить новое устройство" />
+
+    </LinearLayout>
+</FrameLayout>

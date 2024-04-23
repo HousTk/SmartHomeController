@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <foreground android:drawable="@drawable/icon_for_smart_home_controller_mobile_app_in_dark_" />
+
+</adaptive-icon>
