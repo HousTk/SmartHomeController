@@ -1,59 +1,84 @@
 package com.example.smartcontrollerv3.main.di
 
-import com.example.data.data.repository.AddressRepositoryImplementation
-import com.example.data.data.repository.DeviceRepositoryImplementation
-import com.example.data.data.repository.IdRepositoryImplementation
-import com.example.data.data.repository.RoomRepositoryImplementation
+import com.example.data.data.repository.AddressRepositoryImpl
+import com.example.data.data.repository.AuthRepositoryImpl
 import com.example.data.data.repository.SettingsRepositoryImplementation
-import com.example.data.data.repository.settingsStorage.SettingsStorageImpl
-import com.example.data.data.repository.settingsStorage.SettingsStorageInterface
-import com.example.domain.domain.navController.NavigationControllerInterface
+import com.example.data.data.repository.UserRepositoryImpl
+import com.example.data.data.repository.livedataTest.LiveDataRepository
+import com.example.data.data.repository.room.CacheStorageImpl
+import com.example.data.data.repository.room.CacheStorageInterface
+import com.example.data.data.repository.sharedPrefs.settingsStorage.SettingsStorageImpl
+import com.example.data.data.repository.sharedPrefs.settingsStorage.SettingsStorageInterface
 import com.example.domain.domain.repository.AddressRepository
-import com.example.domain.domain.repository.DeviceRepository
-import com.example.domain.domain.repository.IdRepository
-import com.example.domain.domain.repository.RoomRepository
+import com.example.domain.domain.repository.AuthRepository
 import com.example.domain.domain.repository.SettingsRepository
-import com.example.smartcontrollerv3.main.navigationController.NavigationController
+import com.example.domain.domain.repository.UserRepository
+import com.example.smartcontrollerv3.R
 import org.koin.dsl.module
 
 
 val dataModule = module {
 
-    single<DeviceRepository> {
-        DeviceRepositoryImplementation(
-            context = get(),
-            settingsStorageInterface = get())
-    }
+    // REPOSITORIES
 
-
-    single<IdRepository> {
-        IdRepositoryImplementation(
-            context = get(),
-            settingsStorageInterface = get())
-    }
-
-
-    single<RoomRepository> {
-        RoomRepositoryImplementation(
-            context = get(),
-            settingsStorageInterface = get())
-    }
-
-
-    single<AddressRepository>{
-        AddressRepositoryImplementation(
-            context = get(),
-            get())
+    single<AddressRepositoryImpl>{
+        AddressRepositoryImpl(
+            allDevicesRoomIcon = R.drawable.ic_room_alldevices_white,
+            firebaseRepository = get(),
+            firebaseAuthRepository = get(),
+            cacheStorageInterface = get(),
+            settingsStorageInterface = get()
+        )
     }
 
     single<SettingsRepository>{
         SettingsRepositoryImplementation(settingsStorageInterface = get())
     }
 
+    single<AddressRepository> {
+        get<AddressRepositoryImpl>()
+    }
+
+    single<AuthRepository> {
+        AuthRepositoryImpl(
+            firebaseAuthRepository = get(),
+            firebaseRepository = get()
+        )
+    }
+
+    single<UserRepository>{
+        UserRepositoryImpl(
+            cacheStorageInterface = get(),
+            firebaseRepository = get()
+        )
+    }
+
+    single<LiveDataRepository> {
+        get<AddressRepositoryImpl>()
+    }
+
+
+
+    // STORAGES
+
+
+
     single<SettingsStorageInterface>{
         SettingsStorageImpl(
             context = get()
         )
     }
+
+
+    // CACHE
+
+    single<CacheStorageInterface>{
+        CacheStorageImpl(
+            context = get()
+        )
+    }
+
+
+
 
 }

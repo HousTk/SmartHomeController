@@ -3,16 +3,11 @@ package com.example.smartcontrollerv3.main.navigationController
 import android.os.Bundle
 import androidx.navigation.NavController
 import com.example.domain.domain.navController.NavigationControllerInterface
-import com.example.domain.domain.usecase.settings.IsFirstStartUseCase
 import com.example.smartcontrollerv3.R
 import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 
-const val KEY_SELECTED_ROOM_POSITION = "SelRoomPos"
 
-class NavigationController(
-    private val isFirstStartUseCase: IsFirstStartUseCase
-) : NavigationControllerInterface {
+class NavigationController() : NavigationControllerInterface {
 
     data class BundleWithKey(
         var bundleKey: String,
@@ -23,7 +18,7 @@ class NavigationController(
 
     private val bundleList = ArrayList<BundleWithKey>()
 
-    fun putArgsToBundle(bundleKey:String, argKey: String, arg: Any):Boolean{
+    override fun putArgsToBundle(bundleKey:String, argKey: String, arg: Any):Boolean{
 
         var bundle = Bundle()
 
@@ -36,6 +31,10 @@ class NavigationController(
         when (arg) {
             is Int -> {
                 bundle.putInt(argKey, arg)
+            }
+
+            is Long ->{
+                bundle.putLong(argKey, arg)
             }
 
             is String -> {
@@ -68,7 +67,7 @@ class NavigationController(
 
     }
 
-    fun navigateToWithBundle(bundleKey:String, destinationPageId: Int){
+    override fun navigateToWithBundle(bundleKey:String, destinationPageId: Int){
 
         if (this::navHost.isInitialized) {
 
@@ -92,6 +91,7 @@ class NavigationController(
     }
 
     override fun navigateTo(destinationPageId: Int) {
+
         if (this::navHost.isInitialized) {
 
             navHost.navigate(destinationPageId)
@@ -120,6 +120,10 @@ class NavigationController(
                     bundle.putInt(key, args)
                 }
 
+                is Long -> {
+                    bundle.putLong(key, args)
+                }
+
                 is String -> {
                     bundle.putString(key, args)
                 }
@@ -144,20 +148,28 @@ class NavigationController(
 
     }
 
+    override fun setStartDestination(startPageId: Int) {
+
+        val navGraph = navHost.navInflater.inflate(R.navigation.navigation_main)
+
+        navGraph.setStartDestination(startPageId)
+
+        navHost.graph = navGraph
+    }
+
     fun setUpNavHost(host: NavController) {
 
         navHost = host
 
         val navGraph = navHost.navInflater.inflate(R.navigation.navigation_main)
 
-        if (!isFirstStartUseCase.execute()) {
-            navGraph.setStartDestination(R.id.homeFragment)
-        }else{
-            navGraph.setStartDestination(R.id.createFirstAddressFragment)
-        }
+//        if (!isFirstStartUseCase.execute()) {
+//            navGraph.setStartDestination(R.id.homeFragment)
+//        }else{
+//            navGraph.setStartDestination(R.id.welcomePageFragment)
+//        }
 
         navHost.graph = navGraph
-
 
 
     }

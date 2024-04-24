@@ -4,64 +4,58 @@ import com.example.smartcontrollerv3.main.navigationController.NavigationControl
 import com.example.smartcontrollerv3.main.presentation.addAddress.AddAddressViewModel
 import com.example.smartcontrollerv3.main.presentation.addDevice.AddDeviceViewModel
 import com.example.smartcontrollerv3.main.presentation.addDeviceToRoom.AddDeviceToRoomFirstPageViewModel
-import com.example.smartcontrollerv3.main.presentation.addDeviceToRoom.AddDeviceToRoomViewModel
+import com.example.smartcontrollerv3.main.presentation.addDeviceToRoom.addConnectedDevice.AddDeviceToRoomViewModel
 import com.example.smartcontrollerv3.main.presentation.addRoom.AddRoomViewModel
 import com.example.smartcontrollerv3.main.presentation.addresses.AddressesViewModel
 import com.example.smartcontrollerv3.main.presentation.device.DeviceViewModel
-import com.example.smartcontrollerv3.main.presentation.devices.DevicesViewModel
 import com.example.smartcontrollerv3.main.presentation.home.HomeViewModel
-import com.example.smartcontrollerv3.main.presentation.logIn.CreateFirstAddressViewModel
+import com.example.smartcontrollerv3.main.presentation.logIn.createFirstAddress.CreateFirstAddressViewModel
+import com.example.smartcontrollerv3.main.presentation.logIn.loadingPage.DataLoadingViewModel
+import com.example.smartcontrollerv3.main.presentation.logIn.logIn.LogInViewModel
+import com.example.smartcontrollerv3.main.presentation.logIn.logUp.LogUpViewModel
+import com.example.smartcontrollerv3.main.presentation.logIn.welcomePage.WelcomePageViewModel
 import com.example.smartcontrollerv3.main.presentation.mainActivity.MainViewModel
+import com.example.smartcontrollerv3.main.presentation.profile.ProfileViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
 
     single<NavigationController> {
-        NavigationController(get())
-
+        NavigationController()
     }
 
-    viewModel<DevicesViewModel>{
 
-        DevicesViewModel(
-            get(),
-            get(),
-            get(),
-            get()
-        )
-
-    }
 
     viewModel<MainViewModel> {
 
         MainViewModel(
-        navigationController = get()
-    )
-    }
-
-    viewModel<HomeViewModel>{
-        HomeViewModel(
             navigationController = get(),
-            getRoomListUseCase = get(),
-            removeRoomUseCase =  get(),
-            getDeviceUseCase =  get(),
-            removeDeviceFromRoomUseCase =  get(),
-            wifiJobList = get(),
-            getDeviceTypeWifiUseCase = get(),
-            sendTurnOffWifiUseCase = get(),
-            sendTurnOnUseCase = get(),
-            getDeviceSettingsWifiUseCase = get(),
-            getDeviceStateWifiUseCase = get(),
-            getCurrentAddressUseCase = get(),
-            deleteDeviceUseCase = get()
+            isSignedInUseCase = get()
         )
     }
 
-    viewModel<AddDeviceViewModel>{
+    viewModel<HomeViewModel> {
+        HomeViewModel(
+            navigateFromHomeUseCase = get(),
+            getRoomListUseCase = get(),
+            deleteRoomUseCase = get(),
+            getDeviceUseCase = get(),
+            removeDeviceFromRoomUseCase = get(),
+            deleteDeviceUseCase = get(),
+            getRoomUseCase = get(),
+            getAddressUseCase = get(),
+            getSelectedAddressKeyUseCase = get(),
+            wifiGetAndApplyUseCase = get(),
+            wifiSendAndApplyUseCase = get(),
+            getDevicesListInRoomUseCase = get(),
+            liveDataRepository = get()
+        )
+    }
+
+    viewModel<AddDeviceViewModel> {
         AddDeviceViewModel(
-            get(),
-            get(),
+            saveDeviceUseCase = get(),
             get(),
             addDeviceToRoomUseCase = get()
         )
@@ -70,60 +64,95 @@ val appModule = module {
     viewModel<AddRoomViewModel> {
         AddRoomViewModel(
             get(),
-            get(),
-            get(),
-            get()
+            addNewRoomUseCase = get(),
+            getDevicesListInRoomUseCase = get(),
         )
     }
 
-    viewModel<CreateFirstAddressViewModel>{
+    viewModel<CreateFirstAddressViewModel> {
         CreateFirstAddressViewModel(
-            get(),
-            get(),
-            get()
+            addNewAddressUseCase = get(),
+            navigateFromCFAUseCase = get()
 
         )
     }
 
-    viewModel<AddressesViewModel>{
+    viewModel<AddressesViewModel> {
         AddressesViewModel(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get()
+            getAvailableAddressesKeysUseCase =  get(),
+            getSelectedAddressKeyUseCase =  get(),
+            changeSelectedAddressUseCase =  get(),
+            getRoomListUseCase =  get(),
+            removeAddressUseCase =  get(),
+            getAddressUseCase = get(),
+            getDevicesListInRoomUseCase = get(),
+            navigateFromAddressesUseCase = get()
+
         )
     }
 
-    viewModel<AddAddressViewModel>{
+    viewModel<AddAddressViewModel> {
         AddAddressViewModel(
             navigationController = get(),
             addNewAddressUseCase = get()
         )
     }
 
-    viewModel<DeviceViewModel>{
+    viewModel<DeviceViewModel> {
         DeviceViewModel(
             navigationController = get(),
             getDeviceUseCase = get(),
             deleteDeviceUseCase = get(),
-            removeDeviceFromRoomUseCase = get()
+            removeDeviceFromRoomUseCase = get(),
+            wifiSendAndApplyUseCase = get(),
+            liveDataRepository = get()
         )
     }
 
-    viewModel<AddDeviceToRoomFirstPageViewModel>{
+    viewModel<AddDeviceToRoomFirstPageViewModel> {
         AddDeviceToRoomFirstPageViewModel(
-            navigationController = get()
+            navigateFromADTRFPUseCase = get()
         )
     }
 
-    viewModel<AddDeviceToRoomViewModel>{
+    viewModel<AddDeviceToRoomViewModel> {
         AddDeviceToRoomViewModel(
-            navigationController = get()
+            navigateFromADTRUseCase = get(),
+            addDeviceToRoomUseCase = get(),
+            getDevicesListInRoomUseCase = get()
         )
     }
 
+    viewModel<WelcomePageViewModel> {
+        WelcomePageViewModel(
+            navigateFromWelcomePageUseCase = get()
+        )
+    }
+
+    viewModel<LogInViewModel> {
+        LogInViewModel(
+            navigateFromLogIn = get(),
+            signInUseCase = get()
+        )
+    }
+
+    viewModel<LogUpViewModel> {
+        LogUpViewModel(
+            navigateFromLogUpUseCase = get(),
+            registerNewUserUseCase = get()
+        )
+    }
+
+    viewModel<ProfileViewModel>{
+        ProfileViewModel(
+            logOutUseCase = get()
+        )
+    }
+
+    viewModel<DataLoadingViewModel>{
+        DataLoadingViewModel(
+            navigateFromDataLoadingUseCase = get(),
+            actualizeAddresses = get()
+        )
+    }
 }

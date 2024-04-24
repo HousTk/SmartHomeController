@@ -21,6 +21,8 @@ class MainActivity : AppCompatActivity(){
         binging = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binging.root)
 
+        vm.init()
+
         initUi()
     }
 

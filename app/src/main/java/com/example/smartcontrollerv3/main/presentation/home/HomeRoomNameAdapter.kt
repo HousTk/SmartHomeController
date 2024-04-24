@@ -8,14 +8,15 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.domain.domain.models.room.Room
+import com.example.domain.domain.models.main.Room
+import com.example.domain.domain.utils.ALLDEVICES_ROOM_ID
 import com.example.domain.domain.utils.ALLDEVICES_ROOM_NAME
 import com.example.smartcontrollerv3.R
 import com.example.smartcontrollerv3.databinding.ItemHomeRoomBinding
 
 class HomeRoomNameAdapter(
     private val homeRoomNameAdapterInterface: HomeRoomNameAdapterInterface,
-    private var selectedRoomPosition:Int
+    private var selectedRoomPosition:Int = 0
 ):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var roomList = ArrayList<Room>()
@@ -43,18 +44,20 @@ class HomeRoomNameAdapter(
 
             if(position < roomList.size){
 
-                binding.itemHomeRoomName.text = roomList[position].name
+                val room = roomList[position]
+
+                binding.itemHomeRoomName.text = room.name
 
                 binding.itemHomeRoom.setOnClickListener{
                     selectedRoomPosition = position
-                    homeRoomNameAdapterInterface.onRoomClick(position)
+                    homeRoomNameAdapterInterface.onRoomClick(roomId = room.id, position)
 
                 }
 
                 binding.itemHomeRoom.setOnLongClickListener{
 
-                    if(roomList[position].name != ALLDEVICES_ROOM_NAME){
-                        showDeleteMenu(it, position)
+                    if(room.id != ALLDEVICES_ROOM_ID.toLong()){
+                        showDeleteMenu(it, position, room.id)
                     }
 
                     return@setOnLongClickListener true
@@ -69,7 +72,7 @@ class HomeRoomNameAdapter(
                     }
                 )
 
-                binding.itemHomeRoomIcon.setImageResource(roomList[position].icon)
+                binding.itemHomeRoomIcon.setImageResource(room.icon)
 
             }else{
                 binding.itemHomeRoom.setBackgroundColor(
@@ -92,13 +95,13 @@ class HomeRoomNameAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateSelectedRoom(selectedRoom:Int){
-        selectedRoomPosition = selectedRoom
+    fun updateSelectedRoomPosition(selectedRoomPositionNew:Int){
+        selectedRoomPosition = selectedRoomPositionNew
 
         notifyDataSetChanged()
     }
 
-    private fun showDeleteMenu(view: View, roomPosition: Int){
+    private fun showDeleteMenu(view: View,roomPosition:Int ,roomId: Long){
         val menu = PopupMenu(view.context, view)
 
         menu.menu.add(0,0, Menu.NONE, "Delete")
@@ -107,7 +110,7 @@ class HomeRoomNameAdapter(
             when (it.itemId){
 
                 0 -> {
-                    homeRoomNameAdapterInterface.onDeleteRoom(roomPosition)
+                    homeRoomNameAdapterInterface.onDeleteRoom(roomId)
                     Toast.makeText(view.context, "roomDeleted", Toast.LENGTH_SHORT).show()
                     notifyItemRemoved(roomPosition)
                 }

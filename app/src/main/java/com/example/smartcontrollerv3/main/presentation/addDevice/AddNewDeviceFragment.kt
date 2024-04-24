@@ -35,8 +35,14 @@ class AddNewDeviceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        initVM()
+
         initUi()
 
+    }
+
+    private fun initVM(){
+        vm.initVm(currentRoomId = arguments?.getLong("CurrentRoom") ?: -1)
     }
 
     private fun initUi() {
@@ -61,9 +67,8 @@ class AddNewDeviceFragment : Fragment() {
 
         val name = binding.fragmentAddDeviceName.text.toString()
         val ip = binding.fragmentAddDeviceIp.text.toString()
-        val currentRoom = arguments?.getInt("CurrentRoom") ?: -1
 
-        vm.save(name = name, ip = ip, currentRoom = currentRoom)
+        vm.save(name = name, ip = ip)
     }
 
     private fun onClickBack(){

@@ -1,24 +1,22 @@
 package com.example.smartcontrollerv3.main.presentation.addresses
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.domain.domain.models.address.Address
+import com.example.domain.domain.models.main.Address
 import com.example.smartcontrollerv3.R
 import com.example.smartcontrollerv3.databinding.ItemFragmentAddressesAddressBinding
 
 class AddressAdapter(
-    private val callback: AddressAdapterInterface,
-    private var addressesList: ArrayList<Address>,
-    private var selectedAddressPosition: Int
+    private val callback: AddressAdapterInterface
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private var addressesList = emptyList<Address>()
+    private var selectedAddressKey:String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemFragmentAddressesAddressBinding.inflate(
@@ -40,6 +38,7 @@ class AddressAdapter(
 
     private inner class AddressViewHolder(private val binding: ItemFragmentAddressesAddressBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(position: Int) {
             with(binding) {
                 val address = addressesList[position]
@@ -47,7 +46,7 @@ class AddressAdapter(
                 itemFragmentAddressesAddressName.text = address.name
 
                 itemFragmentAddressesAddress.setBackgroundColor(
-                    if (position == selectedAddressPosition) {
+                    if (address.key == selectedAddressKey) {
                         ContextCompat.getColor(
                             itemFragmentAddressesAddress.context,
                             R.color.itemRoomSelected
@@ -61,13 +60,13 @@ class AddressAdapter(
                 )
 
                 itemFragmentAddressesAddress.setOnClickListener {
-                    selectedAddressPosition = position
-                    callback.onAddressSelect(position)
+                    selectedAddressKey = address.key
+                    callback.onAddressSelect(address.key)
                     notifyDataSetChanged()
                 }
 
                 itemFragmentAddressesAddress.setOnLongClickListener {
-                    showDeleteMenu(it, position)
+                    showDeleteMenu(view = it, addressKey = address.key, position = position)
                     return@setOnLongClickListener true
                 }
             }
@@ -75,7 +74,7 @@ class AddressAdapter(
 
     }
 
-    private fun showDeleteMenu(view: View, position: Int) {
+    private fun showDeleteMenu(view: View, addressKey: String, position: Int) {
 
         if(addressesList.size != 1) {
 
@@ -87,7 +86,7 @@ class AddressAdapter(
                 when (it.itemId) {
 
                     0 -> {
-                        deleteAddress(position)
+                        deleteAddress(addressKey,position)
                     }
 
                 }
@@ -98,19 +97,37 @@ class AddressAdapter(
         }
     }
 
-    private fun deleteAddress(position: Int) {
+    private fun deleteAddress(addressKey: String, position: Int) {
 
-        callback.addressDelete(position)
+        callback.addressDelete(addressKey)
+
         notifyItemRemoved(position)
 
     }
 
-    fun updateAddressList(addressList: ArrayList<Address>) {
+    fun updateAddressList(addressList: List<Address>) {
         addressesList = addressList
         notifyDataSetChanged()
     }
 
-    fun updateSelectedAddress(addressPosition:Int){
-        selectedAddressPosition = addressPosition
+    fun updateSelectedAddress(addressKey:String){
+
+        val oldSelectedAddressKey = selectedAddressKey
+
+        selectedAddressKey = addressKey
+
+        repeat(addressesList.size){
+
+            val address = addressesList[it]
+
+            if(address.key == addressKey || address.key == oldSelectedAddressKey){
+
+                notifyItemChanged(it)
+
+            }
+
+        }
+
+
     }
 }

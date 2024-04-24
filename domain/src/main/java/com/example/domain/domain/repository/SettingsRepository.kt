@@ -1,13 +1,13 @@
 package com.example.domain.domain.repository
 
+
+
 interface SettingsRepository {
 
-    fun changeSelectedAddress(selectedAddress:Int):Boolean
+    fun getAndApplyPosts()
+    fun getPosts():HashMap<String, String>
 
-    fun getSelectedAddress():Int
+    fun getSelectedAddressKey():String
 
-    fun firstStartComplete()
-
-    fun isFirstStart():Boolean
-
+    fun changeSelectedAddressKey(selectedAddressKey: String)
 }

@@ -3,26 +3,38 @@ package com.example.smartcontrollerv3.main.presentation.addRoom
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.domain.domain.models.device.Device
-import com.example.domain.domain.usecase.GetDeviceListUseCase
-import com.example.domain.domain.usecase.ids.GetIdsList
+import com.example.domain.domain.models.main.Device
+import com.example.domain.domain.models.saveParams.SaveParamsRoom
+import com.example.domain.domain.usecase.GetDevicesListInRoomUseCase
 import com.example.domain.domain.usecase.rooms.AddNewRoomUseCase
+import com.example.domain.domain.utils.ALLDEVICES_ROOM_ID
 import com.example.domain.domain.utils.ROOM_NAME_MAX_SIZE
 import com.example.smartcontrollerv3.main.navigationController.NavigationController
 import com.example.smartcontrollerv3.main.utils.ROOM_ICONS_ARRAY
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 class AddRoomViewModel(
     private val navigationController: NavigationController,
     private val addNewRoomUseCase: AddNewRoomUseCase,
-    private val getDeviceListUseCase: GetDeviceListUseCase,
-    private val getIdsList: GetIdsList
+    private val getDevicesListInRoomUseCase: GetDevicesListInRoomUseCase
 ):ViewModel() {
 
     val icon = MutableLiveData<Int>(ROOM_ICONS_ARRAY[0])
 
-    fun getDeviceList():ArrayList<Device>{
-        return getDeviceListUseCase.execute(getIdsList.execute())
+    val devicesList = MutableLiveData<List<Device>>()
+
+    fun getDeviceList(){
+
+        CoroutineScope(Dispatchers.Main).launch{
+
+            devicesList.value = getDevicesListInRoomUseCase.execute(roomId = ALLDEVICES_ROOM_ID.toLong())
+
+        }
+
     }
 
     fun back(){
@@ -35,33 +47,29 @@ class AddRoomViewModel(
         icon.value = ic
     }
 
-    fun save(name:String, devicesIdsList:ArrayList<Int>?){
+    fun save(name:String, devicesIdsList:ArrayList<Long>?){
 
         if(name != ""){
 
             if(name.length <= ROOM_NAME_MAX_SIZE){
 
-                if(devicesIdsList == null){
+                val room = SaveParamsRoom(
+                    name = name,
+                    icon = icon.value!!,
+                    devicesIdsInRoom = devicesIdsList
+                )
 
-                    val result = addNewRoomUseCase.execute(roomName = name, icon = icon.value!!)
+                    CoroutineScope(Dispatchers.IO).launch {
 
-                    if (result){
-                        back()
+                        addNewRoomUseCase.execute(room)
+
+                        withContext(Dispatchers.Main){
+
+                            back()
+
+                        }
+
                     }
-
-
-                }else if(devicesIdsList.isNotEmpty()){
-
-                    val result = addNewRoomUseCase.execute(roomName = name, icon = icon.value!!, deviceIdsArrayList = devicesIdsList)
-
-                    if (result){
-                        back()
-                    }
-
-                }else{
-                    throw Exception("Select at least 1 device!")
-                }
-
 
             }else{
                 throw Exception("Max name length $ROOM_NAME_MAX_SIZE symbols")

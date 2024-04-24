@@ -1,14 +1,15 @@
 package com.example.domain.domain.usecase.rooms
 
-import com.example.domain.domain.models.room.Room
-import com.example.domain.domain.repository.RoomRepository
+import com.example.domain.domain.models.main.Room
+import com.example.domain.domain.repository.AddressRepository
 
 class GetRoomListUseCase(
-    private val roomRepository: RoomRepository
+    private val addressRepository: AddressRepository
 ) {
 
-    fun execute():ArrayList<Room>{
-        return roomRepository.getRoomList()
+    suspend fun execute():List<Room>{
+
+        return addressRepository.getRoomList(addressKey = null)
     }
 
 }

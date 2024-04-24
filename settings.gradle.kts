@@ -23,4 +23,6 @@ rootProject.name = "Smart Controller V3"
 include(":app")
 include(":data")
 include(":domain")
-include(":okhttp")
+
+include(":cache")
+include(":firebase")

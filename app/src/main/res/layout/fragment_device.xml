@@ -13,7 +13,7 @@
 
         <include
             android:id="@+id/fragmentDeviceToolbar"
-            layout="@layout/toolbar_stock"/>
+            layout="@layout/toolbar_device"/>
 
         <LinearLayout
             android:layout_marginStart="16dp"
@@ -74,6 +74,11 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentDeviceFC"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 </FrameLayout>

@@ -1,26 +1,33 @@
 package com.example.smartcontrollerv3.main.presentation.addDeviceToRoom
 
 import androidx.lifecycle.ViewModel
-import com.example.smartcontrollerv3.R
-import com.example.smartcontrollerv3.main.navigationController.NavigationController
+import com.example.domain.domain.usecase.navigation.NavigateFromADTRFPUseCase
+import com.example.domain.domain.utils.ALLDEVICES_ROOM_ID
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
 
 class AddDeviceToRoomFirstPageViewModel(
-    private val navigationController: NavigationController
+    private val navigateFromADTRFPUseCase: NavigateFromADTRFPUseCase,
 ) : ViewModel() {
 
-    fun onClickAddDevice(currentRoom: Int) {
-        navigationController.navigateWithArgs(
-            key = "CurrentRoom",
-            args = currentRoom,
-            destinationPageId = R.id.addDeviceToRoomFragment
-        )
+    private var currentRoomId: Long = -1
+
+    fun initVM(roomId: Long) {
+
+        if (roomId == ALLDEVICES_ROOM_ID.toLong()) {
+            navigateFromADTRFPUseCase.toAddNewDevice(roomId = roomId)
+        } else {
+            currentRoomId = roomId
+        }
+
     }
 
-    fun onClickAddNewDevice(currentRoom: Int) {
-        navigationController.navigateWithArgs(
-            key = "CurrentRoom",
-            args = currentRoom,
-            destinationPageId = R.id.addNewDeviceFragment
-        )
+    fun onClickAddDevice() {
+        navigateFromADTRFPUseCase.toAddDeviceToRoom(roomId = currentRoomId)
+    }
+
+    fun onClickAddNewDevice() {
+        navigateFromADTRFPUseCase.toAddNewDevice(roomId = currentRoomId)
     }
 }

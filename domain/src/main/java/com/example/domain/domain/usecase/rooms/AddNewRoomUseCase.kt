@@ -1,19 +1,17 @@
 package com.example.domain.domain.usecase.rooms
 
-import com.example.domain.domain.models.room.Room
-import com.example.domain.domain.repository.RoomRepository
+
+import com.example.domain.domain.models.main.Room
+import com.example.domain.domain.models.saveParams.SaveParamsRoom
+import com.example.domain.domain.repository.AddressRepository
 
 class AddNewRoomUseCase(
-    private val roomRepository: RoomRepository
+    private val addressRepository: AddressRepository
 ) {
 
-    fun execute(roomName:String, icon:Int, deviceIdsArrayList:ArrayList<Int> = ArrayList()):Boolean{
-        val room = Room(
-            name = roomName,
-            icon = icon,
-            devicesIdsInRoom = deviceIdsArrayList
-            )
-        return roomRepository.addToList(room)
+    suspend fun execute(room:SaveParamsRoom):Long{
+
+        return addressRepository.addRoom(addressKey = null, room = room)
 
     }
 

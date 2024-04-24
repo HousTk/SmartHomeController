@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
-import com.example.domain.domain.models.address.Address
-import com.example.smartcontrollerv3.R
+import com.example.domain.domain.models.main.Address
+import com.example.domain.domain.models.saveParams.SaveParamsAddress
 import com.example.smartcontrollerv3.databinding.FragmentAddAddressBinding
 import com.example.smartcontrollerv3.main.confirmationDialogs.ConfirmationDialogThreeButtons
 import com.example.smartcontrollerv3.main.confirmationDialogs.ConfirmationDialogThreeButtonsCallback
@@ -117,13 +117,13 @@ class AddAddressFragment : Fragment() {
 
     }
 
-    private fun getAddress():Address{
+    private fun getAddress(): SaveParamsAddress {
 
         val name = binding.FragmentAddAddressName.text.toString()
 
         val ssid = binding.FragmentAddAddressSSID.text.toString()
 
-        return Address(name = name, wifiSSID = ssid)
+        return SaveParamsAddress(name = name, wifiSSID = ssid)
 
     }
 }

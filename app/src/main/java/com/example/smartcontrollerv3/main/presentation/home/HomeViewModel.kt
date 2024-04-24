@@ -4,282 +4,455 @@ package com.example.smartcontrollerv3.main.presentation.home
 import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.example.domain.domain.models.address.Address
-import com.example.domain.domain.models.device.Device
-import com.example.domain.domain.models.room.Room
+import com.example.data.data.repository.livedataTest.LiveDataRepository
+import com.example.data.data.repository.room.entity.RoomEntityDevice
+import com.example.data.data.repository.room.entity.RoomEntityRoom
+import com.example.domain.domain.callbacks.OnCompleteCallback
+import com.example.domain.domain.models.main.Address
+import com.example.domain.domain.models.main.Device
+import com.example.domain.domain.models.main.Room
 import com.example.domain.domain.usecase.DeleteDeviceUseCase
-
 import com.example.domain.domain.usecase.GetDeviceUseCase
-import com.example.domain.domain.usecase.address.GetCurrentAddressUseCase
+import com.example.domain.domain.usecase.GetDevicesListInRoomUseCase
+import com.example.domain.domain.usecase.address.GetAddressUseCase
+import com.example.domain.domain.usecase.navigation.NavigateFromHomeUseCase
+import com.example.domain.domain.usecase.rooms.DeleteRoomUseCase
 import com.example.domain.domain.usecase.rooms.GetRoomListUseCase
+import com.example.domain.domain.usecase.rooms.GetRoomUseCase
 import com.example.domain.domain.usecase.rooms.RemoveDeviceFromRoomUseCase
-
-import com.example.domain.domain.usecase.rooms.RemoveRoomUseCase
-import com.example.domain.domain.usecase.wifi.GetDeviceSettingsWifiUseCase
-import com.example.domain.domain.usecase.wifi.GetDeviceStateWifiUseCase
-import com.example.domain.domain.usecase.wifi.GetDeviceTypeWifiUseCase
-import com.example.domain.domain.usecase.wifi.SendTurnOffWifiUseCase
-import com.example.domain.domain.usecase.wifi.SendTurnOnWifiUseCase
+import com.example.domain.domain.usecase.settings.GetSelectedAddressKeyUseCase
 import com.example.domain.domain.usecase.wifi.WifiCallback
-import com.example.domain.domain.usecase.wifi.WifiJobList
-import com.example.domain.domain.utils.ALLDEVICES_ROOM_POSITION
-import com.example.domain.domain.utils.TAG
+import com.example.domain.domain.usecase.wifi.WifiGetAndApplyUseCase
+import com.example.domain.domain.usecase.wifi.WifiSendAndApplyUseCase
+import com.example.domain.domain.utils.ALLDEVICES_ROOM_ID
 import com.example.smartcontrollerv3.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-import com.example.smartcontrollerv3.main.navigationController.NavigationController
-import com.example.smartcontrollerv3.main.presentation.device.DeviceFragment
 
-
+private const val TAG = "HomeViewModel"
 class HomeViewModel(
-    private val navigationController: NavigationController,
+    private val navigateFromHomeUseCase: NavigateFromHomeUseCase,
     private val getRoomListUseCase: GetRoomListUseCase,
-    private val removeRoomUseCase: RemoveRoomUseCase,
+    private val deleteRoomUseCase: DeleteRoomUseCase,
     private val getDeviceUseCase: GetDeviceUseCase,
     private val removeDeviceFromRoomUseCase: RemoveDeviceFromRoomUseCase,
-    private val wifiJobList: WifiJobList,
-    private val getDeviceTypeWifiUseCase: GetDeviceTypeWifiUseCase,
-    private val sendTurnOnUseCase: SendTurnOnWifiUseCase,
-    private val sendTurnOffWifiUseCase: SendTurnOffWifiUseCase,
-    private val getDeviceSettingsWifiUseCase: GetDeviceSettingsWifiUseCase,
-    private val getDeviceStateWifiUseCase: GetDeviceStateWifiUseCase,
-    private val getCurrentAddressUseCase: GetCurrentAddressUseCase,
-    private val deleteDeviceUseCase: DeleteDeviceUseCase
+    private val deleteDeviceUseCase: DeleteDeviceUseCase,
+    private val getRoomUseCase: GetRoomUseCase,
+    private val getSelectedAddressKeyUseCase: GetSelectedAddressKeyUseCase,
+    private val getAddressUseCase: GetAddressUseCase,
+    private val getDevicesListInRoomUseCase: GetDevicesListInRoomUseCase,
+    private val wifiGetAndApplyUseCase: WifiGetAndApplyUseCase,
+    private val wifiSendAndApplyUseCase: WifiSendAndApplyUseCase,
+    private val liveDataRepository: LiveDataRepository
 ) : ViewModel() {
 
-    var roomList = MutableLiveData<ArrayList<Room>>()
+
+    val roomList = MutableLiveData<ArrayList<Room>>()
+
+    val selectedRoomId = MutableLiveData<Long>(0)
+
     var selectedRoomPosition = MutableLiveData<Int>(0)
 
     var currentAddress = MutableLiveData<Address>()
 
     val devicesListInSelectedRoom = MutableLiveData<ArrayList<Device>>()
 
+
+    private val wifiJobList = ArrayList<Job>()
+    private var roomsListLiveData: LiveData<List<RoomEntityRoom>>? = null
+    private val devicesLiveDataMap = HashMap<Long, LiveData<RoomEntityDevice>>()
+
+    private lateinit var lifecycleOwner: LifecycleOwner
+
+
     fun onCreateView() {
-        updateRoomList()
-        updateAddress()
-        updateDevices()
-        connectToDevices()
+        CoroutineScope(Dispatchers.IO).launch{
+            getAddress()
+            getRoomList()
+            getDevices()
+            connectToDevices()
+        }
     }
 
-    fun onDestroyView() {
+    fun setLifecycleOwner(p: LifecycleOwner) {
+        lifecycleOwner = p
+    }
+
+
+    fun onStopView() {
+        repeat(wifiJobList.size) {
+            wifiJobList[it].cancel()
+        }
         wifiJobList.clear()
     }
 
-    fun navigateToDevices() {
-        navigationController.navigateTo(R.id.devicesFragment)
+    fun refresh(callback: OnCompleteCallback) {
+        CoroutineScope(Dispatchers.IO).launch {
+            getDevices()
+            connectToDevices()
+            withContext(Dispatchers.Main) {
+                callback.onSuccess()
+            }
+        }
     }
 
+    fun navigateToDevices() {
+        TODO()
+    }
+
+    fun onClickProfile() {
+        navigateFromHomeUseCase.toProfile()
+    }
 
     fun onClickMore(view: View) {
         showMoreMenu(view)
     }
 
     fun onClickAddress(view: View) {
-        navigationController.navigateTo(R.id.addressesFragment)
+        navigateFromHomeUseCase.toAddresses()
     }
 
-    fun onClickRoom(position: Int) {
+    fun onClickRoom(roomId: Long, roomPosition: Int) {
 
-        selectedRoomPosition.value = position
+        selectedRoomId.value = roomId
 
-        updateDevices()
+        selectedRoomPosition.value = roomPosition
 
-        connectToDevices()
+        CoroutineScope(Dispatchers.IO).launch {
+            getDevices()
+            connectToDevices()
+        }
+
+        //connectToDevices()
 
     }
 
     fun onClickAddRoom() {
-        navigationController.navigateTo(R.id.addRoomFragment)
+        navigateFromHomeUseCase.toAddRoom()
     }
 
     fun onClickAddDevice() {
 
-        navigationController.navigateWithArgs(
-            key = "CurrentRoom",
-            args = selectedRoomPosition.value!!,
-            destinationPageId = R.id.addDeviceToRoomFirstPageFragment
-        )
+        val args = selectedRoomId.value!!
+
+        navigateFromHomeUseCase.toAddDevice(roomId = args)
 
     }
 
 
-    fun connectToDevices() {
+    private fun connectToDevices() {
 
-        val idsInRoom = roomList.value!![selectedRoomPosition.value!!].devicesIdsInRoom
+        CoroutineScope(Dispatchers.IO).launch() {
 
-        Log.i(TAG, "Connecting to devices...")
+            val devices = devicesListInSelectedRoom.value
 
-        repeat(idsInRoom.size) {
+            repeat(devices?.size ?: 0) {
 
-            val deviceId = idsInRoom[it]
+                val job = CoroutineScope(Dispatchers.IO).launch {
 
-            val device = getDeviceUseCase.execute(id = deviceId)
+                    wifiGetAndApplyUseCase.type(
+                        device = devices!![it],
+                        callback = object : WifiCallback {
+                            override fun requestComplete(isSuccess: Boolean) {
+                                getDeviceSettings(devices[it])
+                            }
 
-            Log.i(TAG, "Connecting to ${device.ip}")
-
-            if (device.type == -1) {
-                getDeviceTypeWifiUseCase.execute(
-                    object : WifiCallback {
-                        override fun requestComplete(isSuccess: Boolean) {
-                            Log.i(TAG, "Got type of ${device.ip} ")
-                            getDeviceState(deviceId)
                         }
+                    )
 
-                        override fun updateDevice() {
-                            updateDevices()
-                        }
+                }
 
-                    },
-                    deviceId
-                )
-            } else {
-                getDeviceState(deviceId)
+                wifiJobList.add(job)
+
+            }
+
+        }
+
+
+    }
+
+
+    fun getDeviceSettings(device: Device) {
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            wifiGetAndApplyUseCase.settings(
+                device = device,
+                callback = object : WifiCallback {
+                    override fun requestComplete(isSuccess: Boolean) {
+
+                    }
+
+                }
+            )
+        }
+        wifiJobList.add(job)
+    }
+
+    fun sendTurnOnToDevice(deviceId: Long) {
+        Log.i(TAG, "Sending turn on...")
+
+        var device:Device? = null
+
+        val listTmp = devicesListInSelectedRoom.value ?: emptyList()
+
+        repeat(listTmp.size) {
+            val deviceTmp = listTmp[it]
+            if(deviceTmp.id == deviceId) device = deviceTmp
+        }
+
+        if(device == null) throw Exception("There is no device with id $deviceId")
+
+        val job = CoroutineScope(Dispatchers.IO).launch {
+
+            wifiSendAndApplyUseCase.turnOn(
+                device = device!!,
+                callback = object : WifiCallback {
+                    override fun requestComplete(isSuccess: Boolean) {
+
+                    }
+
+                }
+            )
+
+        }
+
+        wifiJobList.add(job)
+
+    }
+
+    fun sendTurnOffToDevice(deviceId: Long) {
+        Log.i(TAG, "Sending turn off...")
+
+        var device:Device? = null
+
+        val listTmp = devicesListInSelectedRoom.value ?: emptyList()
+
+        repeat(listTmp.size) {
+            val deviceTmp = listTmp[it]
+            if(deviceTmp.id == deviceId) device = deviceTmp
+        }
+
+        if(device == null) throw Exception("There is no device with id $deviceId")
+
+        val job = CoroutineScope(Dispatchers.IO).launch {
+
+            wifiSendAndApplyUseCase.turnOff(
+                device = device!!,
+                callback = object : WifiCallback {
+                    override fun requestComplete(isSuccess: Boolean) {
+
+                    }
+                }
+            )
+
+        }
+
+        wifiJobList.add(job)
+    }
+
+
+    private suspend fun getAddress() {
+        val address = getAddressUseCase.execute(getSelectedAddressKeyUseCase.execute())
+
+        withContext(Dispatchers.Main) {
+            currentAddress.value = address
+        }
+    }
+
+    private suspend fun getRoomList() {
+        val list = getRoomListUseCase.execute()
+
+        withContext(Dispatchers.Main) {
+            //roomList.value = ArrayList(list)
+
+            observeRoomList()
+        }
+    }
+
+    private suspend fun getDevices() {
+
+        withContext(Dispatchers.Main) {
+            devicesLiveDataMap.forEach {
+                devicesLiveDataMap[it.key]?.removeObserver(deviceObserver)
+            }
+            devicesLiveDataMap.clear()
+        }
+
+        if (selectedRoomId.value == null) {
+            throw Exception("There is no room selected")
+        }
+
+        val roomId = selectedRoomId.value!!
+
+        val list = getDevicesListInRoomUseCase.execute(roomId)
+
+        withContext(Dispatchers.Main) {
+            devicesListInSelectedRoom.value = ArrayList(list)
+
+            repeat(list.size) {
+                val device = list[it]
+                observeDevice(id = device.id)
             }
         }
     }
 
-    fun getDeviceState(deviceId: Int) {
+    private val deviceObserver = Observer<RoomEntityDevice>{
 
-        getDeviceStateWifiUseCase.execute(
-            object : WifiCallback {
-                override fun requestComplete(isSuccess: Boolean) {
-                    Log.i(TAG, "Got State")
-                }
+        Log.i(TAG, "Device updated. $it")
 
-                override fun updateDevice() {
-                    updateDevices()
-                }
+        val curList = (devicesListInSelectedRoom.value ?: ArrayList())
 
-            },
-            deviceId = deviceId
-        )
-    }
-
-    fun getDeviceSettings(deviceId: Int) {
-
-        getDeviceSettingsWifiUseCase.execute(
-            object : WifiCallback {
-                override fun requestComplete(isSuccess: Boolean) {
-                    Log.i(TAG, "Got settings")
-                }
-
-                override fun updateDevice() {
-                    updateDevices()
-                }
-
-            },
-            deviceId = deviceId
+        val deviceToAdd =  Device(
+            id = it.id!!,
+            ip = it.ip,
+            name = it.name,
+            type = it.type,
+            status = it.status,
+            isUpdating = it.isUpdating,
+            settings = it.settings
         )
 
+        repeat(curList.size) {iteration ->
+            val device = curList[iteration]
+
+            if (device.id == it.id) {
+                curList[iteration] = deviceToAdd
+                devicesListInSelectedRoom.value = curList
+                return@Observer
+            }
+        }
+
+        curList.add(deviceToAdd)
+        devicesListInSelectedRoom.value = curList
+        return@Observer
+
+    }
+    private fun observeDevice(id: Long) {
+        val livedata = liveDataRepository.getDeviceLiveData(addressKey = null, id = id)
+
+        livedata.observe(lifecycleOwner,deviceObserver)
+
+        devicesLiveDataMap[id] = livedata
     }
 
-    fun sendTurnOnToDevice(deviceId: Int) {
-        Log.i(TAG, "Sending turn on...")
+    private fun observeRoomList() {
+        val liveData = liveDataRepository.getRoomListLiveData(addressKey = null)
 
-        sendTurnOnUseCase.execute(
-            object : WifiCallback {
-                override fun requestComplete(isSuccess: Boolean) {
+        liveData.observe(lifecycleOwner) { newRoomList ->
+            val roomListTmp = ArrayList<Room>()
+
+            repeat(newRoomList.size) {
+                val roomTmp = newRoomList[it]
+                roomListTmp.add(
+                    Room(
+                        id = roomTmp.id!!,
+                        name = roomTmp.name,
+                        icon = roomTmp.icon,
+                        devicesIdsInRoom = roomTmp.devicesIdsInRoom
+                    )
+                )
+            }
+            roomList.value = roomListTmp
+        }
+    }
+
+    fun deleteRoom(roomId: Long) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            deleteRoomUseCase.execute(roomId = roomId)
+
+            if (selectedRoomId.value!! == roomId) {
+
+                withContext(Dispatchers.Main) {
+
+                    selectedRoomId.value = ALLDEVICES_ROOM_ID.toLong()
+                    selectedRoomPosition.value = 0
+                    getDevices()
 
                 }
 
-                override fun updateDevice() {
-                    updateDevices()
+            }
+
+            //getRoomList()
+        }
+
+
+    }
+
+    fun deleteOrRemoveDevice(deviceId: Long) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            withContext(Dispatchers.Main) {
+                devicesLiveDataMap[deviceId]?.removeObserver(deviceObserver)
+                devicesLiveDataMap.remove(deviceId)
+
+                val listTmp = devicesListInSelectedRoom.value ?: throw Exception()
+                repeat(listTmp.size){
+                    if(listTmp[it].id == deviceId) {
+                        listTmp.removeAt(it)
+                        devicesListInSelectedRoom.value = listTmp
+                    }
                 }
+            }
 
-            },
-            deviceId = deviceId
-        )
+            if (selectedRoomId.value!! == ALLDEVICES_ROOM_ID.toLong()) {
+                deleteDeviceUseCase.execute(id = deviceId)
+
+            } else {
+                removeDeviceFromRoomUseCase.execute(
+                    deviceId = deviceId,
+                    roomId = selectedRoomId.value!!
+                )
+            }
+        }
     }
 
-    fun sendTurnOffToDevice(deviceId: Int) {
-        Log.i(TAG, "Sending turn off...")
+    fun deleteDevice(deviceId: Long) {
 
-        sendTurnOffWifiUseCase.execute(
-            object : WifiCallback {
-                override fun requestComplete(isSuccess: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
 
-                }
-
-                override fun updateDevice() {
-                    updateDevices()
-                }
-
-            },
-            deviceId = deviceId
-        )
-    }
-
-    fun updateDevices() {
-        devicesListInSelectedRoom.value = getDevices()
-    }
-
-    fun updateRoomList() {
-        roomList.value = getRoomListUseCase.execute()
-    }
-
-    fun updateAddress() {
-        currentAddress.value = getCurrentAddressUseCase.execute()
-    }
-
-    fun deleteRoom(roomPosition: Int) {
-        removeRoomUseCase.execute(roomPosition = roomPosition)
-
-        updateRoomList()
-    }
-
-    fun deleteDevice(deviceId: Int) {
-
-        if (selectedRoomPosition.value!! == ALLDEVICES_ROOM_POSITION) {
 
             deleteDeviceUseCase.execute(id = deviceId)
 
-        } else {
-            removeDeviceFromRoomUseCase.execute(
-                deviceId = deviceId,
-                roomPosition = selectedRoomPosition.value!!
-            )
-        }
 
-        updateDevices()
+            getDevices()
+        }
+    }
+
+    fun removeDevice(deviceId: Long) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            if (selectedRoomId.value!! != ALLDEVICES_ROOM_ID.toLong()) {
+
+                removeDeviceFromRoomUseCase.execute(
+                    deviceId = deviceId,
+                    roomId = selectedRoomId.value!!
+                )
+
+            }
+
+            getDevices()
+        }
     }
 
 
-    fun onDeviceClick(deviceId: Int) {
+    fun onDeviceClick(deviceId: Long) {
 
-        navigationController.putArgsToBundle(
-            bundleKey = "ToDevice",
-            argKey = DeviceFragment().KEY_DEVICE_ID,
-            arg = deviceId
+        navigateFromHomeUseCase.toDevice(
+            deviceId = deviceId,
+            roomId = selectedRoomId.value!!
         )
-
-        navigationController.putArgsToBundle(
-            bundleKey = "ToDevice",
-            argKey = DeviceFragment().KEY_ROOM_POSITION,
-            arg = selectedRoomPosition.value!!
-        )
-
-        navigationController.navigateToWithBundle(
-            bundleKey = "ToDevice",
-            destinationPageId = R.id.deviceFragment
-        )
-
-    }
-
-    private fun getDevices(): ArrayList<Device> {
-        if (selectedRoomPosition.value == null) {
-            throw Exception("There is no room selected")
-        }
-
-        val list = ArrayList<Device>()
-
-        val room = getRoomListUseCase.execute()[selectedRoomPosition.value!!]
-
-        repeat(room.devicesIdsInRoom.size) {
-            list.add(getDeviceUseCase.execute(room.devicesIdsInRoom[it]))
-        }
-
-        return list
 
     }
 
@@ -304,4 +477,6 @@ class HomeViewModel(
 
         menu.show()
     }
+
+
 }

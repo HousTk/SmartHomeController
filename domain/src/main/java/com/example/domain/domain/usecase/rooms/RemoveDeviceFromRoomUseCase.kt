@@ -1,17 +1,15 @@
 package com.example.domain.domain.usecase.rooms
 
-import com.example.domain.domain.repository.RoomRepository
+import com.example.domain.domain.repository.AddressRepository
+
 
 class RemoveDeviceFromRoomUseCase(
-    private val roomRepository: RoomRepository
+    private val addressRepository: AddressRepository
 ) {
 
-    fun execute(deviceId:Int, roomPosition:Int):Boolean{
+    suspend fun execute(deviceId:Long, roomId:Long):Boolean{
 
-        return roomRepository.removeDeviceId(
-            deviceId = deviceId,
-            roomPosition = roomPosition
-        )
+        return addressRepository.removeDeviceId(addressKey = null, deviceId = deviceId, roomId = roomId)
 
     }
 

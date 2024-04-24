@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+/firebase/src/main/java/com/example/firebase/utils/DATABASE_URL.kt
+/app/google-services.json

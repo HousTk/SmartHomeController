@@ -8,7 +8,8 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.domain.domain.models.device.Device
+import com.example.domain.domain.models.main.Device
+import com.example.domain.domain.utils.ALLDEVICES_ROOM_ID
 import com.example.domain.domain.utils.TYPES_ARRAY
 import com.example.domain.domain.utils.TYPE_LEDCONTROLLER
 import com.example.domain.domain.utils.TYPE_LIGHTCONTROLLER
@@ -16,9 +17,11 @@ import com.example.domain.domain.utils.TYPE_WATERCONTROLLER
 import com.example.smartcontrollerv3.R
 import com.example.smartcontrollerv3.databinding.ItemHomeDeviceBinding
 import com.example.smartcontrollerv3.main.utils.getDeviceIconByType
+import com.example.smartcontrollerv3.main.utils.getDisplayedType
 
 class HomeDeviceAdapter(
-    private val callback: HomeDeviceAdapterInterface
+    private val callback: HomeDeviceAdapterInterface,
+    private var currentRoomId: Long
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var devices = ArrayList<Device>()
@@ -61,27 +64,22 @@ class HomeDeviceAdapter(
                 itemHomeDeviceImage.setImageResource(getDeviceIconByType(device.type))
 
                 itemHomeDeviceType.setText(
-                    when (device.type) {
-                        TYPE_LEDCONTROLLER -> R.string.led
-                        TYPE_LIGHTCONTROLLER -> R.string.light
-                        TYPE_WATERCONTROLLER -> R.string.waterController
-                        else -> R.string.other
-                    }
+                   getDisplayedType(deviceType = device.type)
                 )
 
                 itemHomeDeviceSwitch.setOnClickListener {
-                    if (device.state) {
+                    if (device.settings.state) {
                         callback.turnOffDevice(deviceId = device.id)
                     } else {
                         callback.turnOnDevice(deviceId = device.id)
                     }
                 }
-                itemHomeDeviceSwitch.isChecked = device.state
+                itemHomeDeviceSwitch.isChecked = device.settings.state
 
                 itemHomeDeviceName.text = device.name
 
                 itemHomeDevice.setOnClickListener {
-                    callback.onDeviceClick(device.id)
+                    callback.onDeviceClick(device)
                 }
 
                 itemHomeDevice.setOnLongClickListener {
@@ -95,16 +93,23 @@ class HomeDeviceAdapter(
         }
     }
 
-    fun updateDeviceList(deviceList: ArrayList<Device>) {
+    fun updateDeviceList(deviceList: ArrayList<Device>, selectedRoomId: Long) {
+
+        currentRoomId = selectedRoomId
         devices = sortDeviceList(deviceList)
 
         notifyDataSetChanged()
     }
 
-    private fun showDeleteMenu(view: View, deviceId: Int, position: Int) {
+    private fun showDeleteMenu(view: View, deviceId: Long, position: Int) {
         val menu = PopupMenu(view.context, view)
 
-        menu.menu.add(0, 0, Menu.NONE, "Delete")
+        menu.menu.add(
+            0,
+            0,
+            Menu.NONE,
+            if (currentRoomId == ALLDEVICES_ROOM_ID.toLong()) "Delete" else "Remove"
+        )
 
         menu.setOnMenuItemClickListener {
             when (it.itemId) {

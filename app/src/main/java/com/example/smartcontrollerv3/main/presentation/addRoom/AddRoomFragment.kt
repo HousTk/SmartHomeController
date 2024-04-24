@@ -53,7 +53,7 @@ class AddRoomFragment : Fragment() {
 
     private fun initAdapters() {
 
-        devicesAdapter = AddRoomDeviceAdapter(vm.getDeviceList())
+        devicesAdapter = AddRoomDeviceAdapter()
 
         iconsAdapter = AddRoomIconAdapter(
             object : AddRoomIconAdapterInterface {
@@ -116,9 +116,18 @@ class AddRoomFragment : Fragment() {
     }
 
     private fun initVMobservers() {
+
         vm.icon.observe(requireActivity()) { image ->
             binding.fragmentAddRoomIconImage.setImageResource(image)
         }
+
+        vm.devicesList.observe(requireActivity()){list ->
+
+            devicesAdapter.updateDevicesList(list)
+
+        }
+
+        vm.getDeviceList()
     }
 
     private fun changeIconsRV() {

@@ -4,12 +4,120 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.presentation.device.LedControllerFragment">
+    tools:context=".main.presentation.device.fragments.LedControllerFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical">
 
+        <ImageView
+            android:layout_marginTop="20dp"
+            android:id="@+id/fragmentLedControllerState"
+            android:layout_width="50dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_power_red"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+
+        <TextView
+            android:id="@+id/fragmentLedControllerBrightnessText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:text="Brightness"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/fragmentLedControllerBrightnessText_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:text="0"
+            android:textSize="20sp"
+            android:visibility="gone" />
+
+        <SeekBar
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18dp"
+            android:id="@+id/fragmentLedControllerBrightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/fragmentLedControllerRGBswitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:text="RGB"
+            android:textColor="@android:color/holo_blue_bright" />
+
+        <com.skydoves.colorpickerview.ColorPickerView
+            android:id="@+id/fragmentLedControllerColorPicker"
+
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/fragmentLedControllerRedText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center_horizontal"
+            android:text="Red"
+            android:textSize="20sp" />
+
+        <SeekBar
+            android:id="@+id/fragmentLedControllerRed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="18dp" />
+
+        <TextView
+            android:id="@+id/fragmentLedControllerGreenText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal"
+            android:text="Green"
+            android:textSize="20sp" />
+
+        <SeekBar
+            android:id="@+id/fragmentLedControllerGreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="18dp" />
+
+        <TextView
+            android:id="@+id/fragmentLedControllerBlueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal"
+            android:text="Blue"
+            android:textSize="20sp" />
+
+        <SeekBar
+            android:id="@+id/fragmentLedControllerBlue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="18dp" />
+
+
+    </LinearLayout>
 </FrameLayout>

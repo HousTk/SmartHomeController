@@ -2,37 +2,54 @@ package com.example.smartcontrollerv3.main.presentation.addDevice
 
 import android.view.View
 import androidx.lifecycle.ViewModel
-import com.example.domain.domain.models.device.SavingDeviceParam
+import com.example.domain.domain.models.saveParams.SaveParamsDevice
 import com.example.domain.domain.usecase.SaveDeviceUseCase
-import com.example.domain.domain.usecase.ids.GetNewId
+
 import com.example.domain.domain.usecase.rooms.AddDeviceToRoomUseCase
-import com.example.domain.domain.utils.ALLDEVICES_ROOM_POSITION
+import com.example.domain.domain.utils.ALLDEVICES_ROOM_ID
 import com.example.smartcontrollerv3.R
 import com.example.smartcontrollerv3.main.navigationController.NavigationController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddDeviceViewModel(
-    private val getNewId: GetNewId,
     private val saveDeviceUseCase: SaveDeviceUseCase,
     private val navigationController: NavigationController,
     private val addDeviceToRoomUseCase: AddDeviceToRoomUseCase
 ):ViewModel() {
 
+    private var roomId:Long = -1
+    fun initVm(currentRoomId:Long){
 
-    fun save(name:String, ip:String, currentRoom:Int = -1){
+        roomId = currentRoomId
 
-        val newId = getNewId.execute()
+    }
 
-        val savingDeviceParam = SavingDeviceParam(name = name, ip = ip,id = newId)
+    fun save(name:String, ip:String){
 
-        val resultSavingDevice = saveDeviceUseCase.execute(savingDeviceParam)
+        val saveParamsDevice = SaveParamsDevice(name = name, ip = ip, type = -1)
 
-        if(currentRoom != -1 && currentRoom != ALLDEVICES_ROOM_POSITION) {
-            val resultDeviceAdd = addDeviceToRoomUseCase.execute(newId, currentRoom)
+        CoroutineScope(Dispatchers.IO).launch{
+
+            val deviceId = saveDeviceUseCase.execute(saveParamsDevice)
+
+            if(roomId != ALLDEVICES_ROOM_ID.toLong()) {
+
+                addDeviceToRoomUseCase.execute(deviceId = deviceId, roomId)
+
+            }
+
+            withContext(Dispatchers.Main){
+
+                back()
+
+            }
+
+
         }
 
-        if (resultSavingDevice) {
-            back()
-        }
     }
 
 

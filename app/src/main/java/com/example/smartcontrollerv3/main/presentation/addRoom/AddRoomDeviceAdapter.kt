@@ -3,13 +3,15 @@ package com.example.smartcontrollerv3.main.presentation.addRoom
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.domain.domain.models.device.Device
+import com.example.domain.domain.models.main.Device
 import com.example.smartcontrollerv3.R
 import com.example.smartcontrollerv3.databinding.ItemFragmentAddRoomDeviceBinding
 
-class AddRoomDeviceAdapter(private val deviceList: ArrayList<Device>):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class AddRoomDeviceAdapter():RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val selectedIdsList = ArrayList<Int>()
+    private var deviceList = emptyList<Device>()
+
+    val selectedIdsList = ArrayList<Long>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemFragmentAddRoomDeviceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -50,5 +52,13 @@ class AddRoomDeviceAdapter(private val deviceList: ArrayList<Device>):RecyclerVi
             }
 
         }
+    }
+
+    fun updateDevicesList(list: List<Device>){
+
+        deviceList = list
+
+        notifyDataSetChanged()
+
     }
 }

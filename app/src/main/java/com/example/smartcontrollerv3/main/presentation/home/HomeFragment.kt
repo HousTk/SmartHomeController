@@ -1,15 +1,14 @@
 package com.example.smartcontrollerv3.main.presentation.home
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.domain.domain.models.room.Room
+import com.example.domain.domain.callbacks.OnCompleteCallback
+import com.example.domain.domain.models.main.Device
 import com.example.smartcontrollerv3.databinding.FragmentHomeBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -43,13 +42,19 @@ class HomeFragment : Fragment() {
         initAdapters()
         initUi()
         initVMobservers()
+        vm.setLifecycleOwner(requireActivity())
         vm.onCreateView()
 
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        vm.onDestroyView()
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        vm.onStopView()
     }
 
     private fun onClickBack(){
@@ -68,9 +73,34 @@ class HomeFragment : Fragment() {
                 toolbarText.setOnClickListener{
                     vm.onClickAddress(it)
                 }
+
+                toolbarProfile.setOnClickListener{
+                    vm.onClickProfile()
+                }
+
+
             }
             fragmentHomeFloatingButton.setOnClickListener{
                 vm.onClickAddDevice()
+            }
+
+            fragmentHomeRefresh.setOnRefreshListener {
+
+                vm.refresh(
+                    callback = object : OnCompleteCallback {
+
+                        override fun onSuccess() {
+                            fragmentHomeRefresh.isRefreshing = false
+                        }
+
+                        override fun onFail(message: String) {
+                            TODO("Not yet implemented")
+                        }
+
+
+                    }
+                )
+
             }
 
             fragmentHomeRVrooms.layoutManager = LinearLayoutManager(
@@ -87,7 +117,6 @@ class HomeFragment : Fragment() {
             fragmentHomeRVdevices.adapter = devicesAdapter
         }
 
-        vm.updateRoomList()
 
     }
 
@@ -95,41 +124,45 @@ class HomeFragment : Fragment() {
 
         roomsAdapter = HomeRoomNameAdapter(
             object : HomeRoomNameAdapterInterface{
-                override fun onRoomClick(position: Int) {
-                    vm.onClickRoom(position)
+
+                override fun onRoomClick(roomId: Long, roomPosition: Int) {
+                    vm.onClickRoom(roomId = roomId, roomPosition = roomPosition)
                 }
 
-                override fun onDeleteRoom(position: Int) {
-                    vm.deleteRoom(position)
+                override fun onDeleteRoom(roomId: Long) {
+                    vm.deleteRoom(roomId)
                 }
 
                 override fun onCreateRoomClick() {
                     vm.onClickAddRoom()
                 }
 
-            },
-            vm.selectedRoomPosition.value!!
+            }
         )
 
         devicesAdapter = HomeDeviceAdapter(
             object : HomeDeviceAdapterInterface{
-                override fun onDeviceClick(deviceId: Int) {
-                    vm.onDeviceClick(deviceId)
+                override fun onDeviceClick(device: Device) {
+
+                    vm.onDeviceClick(deviceId = device.id)
+
                 }
 
-                override fun deleteDevice(deviceId: Int) {
-                    vm.deleteDevice(deviceId)
+                override fun deleteDevice(deviceId: Long) {
+                    vm.deleteOrRemoveDevice(deviceId)
                 }
 
-                override fun turnOnDevice(deviceId: Int) {
+                override fun turnOnDevice(deviceId: Long) {
                     vm.sendTurnOnToDevice(deviceId)
                 }
 
-                override fun turnOffDevice(deviceId: Int) {
+                override fun turnOffDevice(deviceId: Long) {
                     vm.sendTurnOffToDevice(deviceId)
                 }
 
-            }
+            },
+            vm.selectedRoomId.value!!
+
         )
     }
 
@@ -141,15 +174,15 @@ class HomeFragment : Fragment() {
 
         }
 
-        vm.selectedRoomPosition.observe(requireActivity()){selectedPosition ->
+        vm.selectedRoomPosition.observe(requireActivity()){ selectedPosition ->
 
-            roomsAdapter.updateSelectedRoom(selectedPosition)
+            roomsAdapter.updateSelectedRoomPosition(selectedPosition)
 
         }
 
         vm.devicesListInSelectedRoom.observe(requireActivity()){devicesList ->
 
-            devicesAdapter.updateDeviceList(deviceList = devicesList)
+            devicesAdapter.updateDeviceList(deviceList = devicesList, selectedRoomId = vm.selectedRoomId.value!!)
 
 
         }
@@ -159,12 +192,6 @@ class HomeFragment : Fragment() {
             binding.toolBar.toolbarText.text = vm.currentAddress.value!!.name
 
         }
-    }
-
-    private fun updateUi(roomList: ArrayList<Room>){
-
-
-
     }
 
 }

@@ -12,8 +12,8 @@
         android:orientation="vertical">
 
         <include
-            layout="@layout/toolbar_stock"
-            android:id="@+id/fragmentAddressesToolbar"/>
+            android:id="@+id/fragmentAddressesToolbar"
+            layout="@layout/toolbar_stock" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,9 +44,9 @@
             </LinearLayout>
 
             <ScrollView
-                android:layout_marginStart="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -88,13 +88,15 @@
                         android:textSize="20sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:layout_marginTop="8dp"
                         android:id="@+id/fragmentAddressesRoomsRV"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        tools:listitem="@layout/item_fragment_addresses_room"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
                         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                        app:spanCount="3"/>
+                        app:spanCount="3"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_fragment_addresses_room" />
 
                     <TextView
                         android:id="@+id/fragmentAddressesDevices"
@@ -107,8 +109,14 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/fragmentAddressesDevicesRV"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
+                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                        app:spanCount="3"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_fragment_addresses_device" />
                 </LinearLayout>
             </ScrollView>
 

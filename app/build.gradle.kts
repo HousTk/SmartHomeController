@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -41,6 +42,8 @@ android {
 
 dependencies {
 
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
     implementation ("com.github.skydoves:colorpickerview:2.3.0")
 
     //view model
@@ -65,6 +68,10 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(project(":data"))
     implementation(project(":domain"))
+    implementation(project(":cache"))
+    implementation(project(":firebase"))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

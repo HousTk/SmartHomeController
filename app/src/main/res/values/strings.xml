@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Smart Controller V3</string>
+    <string name="app_name">Smart Controller V3.1</string>
     <!-- TODO: Remove or change this placeholder text -->
+
     <string name="led">LED</string>
     <string name="light">Light</string>
     <string name="waterHeater">Heater</string>

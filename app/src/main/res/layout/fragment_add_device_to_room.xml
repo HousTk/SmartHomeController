@@ -3,12 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.presentation.addDeviceToRoom.AddDeviceToRoomFragment">
+    tools:context=".main.presentation.addDeviceToRoom.addConnectedDevice.AddDeviceToRoomFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical">
 
+        <include
+            android:id="@+id/fragmentAddDeviceToRoomToolbar"
+            layout="@layout/toolbar_confirmation"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fragmentAddDeviceToRoomRV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 </FrameLayout>

@@ -1,6 +1,6 @@
 package com.example.data.data.repository
 
-import com.example.data.data.repository.settingsStorage.SettingsStorageInterface
+import com.example.data.data.repository.sharedPrefs.settingsStorage.SettingsStorageInterface
 import com.example.domain.domain.repository.SettingsRepository
 
 class SettingsRepositoryImplementation(
@@ -8,20 +8,26 @@ class SettingsRepositoryImplementation(
     private val settingsStorageInterface: SettingsStorageInterface
 
 ):SettingsRepository {
+    override fun getAndApplyPosts() {
 
-    override fun changeSelectedAddress(selectedAddress: Int): Boolean {
-        return settingsStorageInterface.changeSelectedAddress(selectedAddress)
+        val posts = settingsStorageInterface.getPosts()
+
+        settingsStorageInterface.savePosts(posts)
     }
 
-    override fun getSelectedAddress(): Int {
-        return settingsStorageInterface.getSelectedAddress()
+    override fun getPosts(): HashMap<String, String> {
+
+        return settingsStorageInterface.getPosts()
+
     }
 
-    override fun firstStartComplete() {
-        settingsStorageInterface.firstStartComplete()
+    override fun getSelectedAddressKey(): String {
+        return settingsStorageInterface.getSelectedAddressKey()
     }
 
-    override fun isFirstStart(): Boolean {
-        return settingsStorageInterface.isFirstStart()
+    override fun changeSelectedAddressKey(selectedAddressKey: String) {
+        settingsStorageInterface.changeSelectedAddress(selectedAddressKey)
     }
+
+
 }

@@ -2,12 +2,14 @@ package com.example.domain.domain.usecase.settings
 
 import com.example.domain.domain.repository.SettingsRepository
 
+
 class ChangeSelectedAddressUseCase(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
 ) {
 
-    fun execute(selectedAddress: Int){
-        settingsRepository.changeSelectedAddress(selectedAddress)
+    suspend fun execute(selectedAddressKey: String){
+        settingsRepository.changeSelectedAddressKey(selectedAddressKey = selectedAddressKey)
+
     }
 
 }

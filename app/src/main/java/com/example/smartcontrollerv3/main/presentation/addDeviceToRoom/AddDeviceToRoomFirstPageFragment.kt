@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.smartcontrollerv3.R
 import com.example.smartcontrollerv3.databinding.FragmentAddDeviceToRoomFirstPageBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -27,18 +26,31 @@ class AddDeviceToRoomFirstPageFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        initVM()
+
         initUi()
     }
 
+    private fun initVM(){
+
+        val currentRoom = arguments?.getLong("CurrentRoom") ?: -1
+
+        vm.initVM(currentRoom)
+
+    }
+
     private fun initUi(){
+
         with(binding){
             fragmentAddDeviceToRoomFirstPageAddDeviceButton.setOnClickListener{
-                vm.onClickAddDevice(arguments?.getInt("CurrentRoom") ?: -1)
+                vm.onClickAddDevice()
             }
 
             fragmentAddDeviceToRoomFirstPageAddNewDeviceButton.setOnClickListener{
-                vm.onClickAddNewDevice(arguments?.getInt("CurrentRoom") ?: -1)
+                vm.onClickAddNewDevice()
             }
+
         }
 
     }

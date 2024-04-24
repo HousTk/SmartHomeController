@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".main.presentation.home.HomeFragment">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -41,6 +42,15 @@
             app:layout_constraintTop_toBottomOf="@+id/textView5"
             tools:listitem="@layout/item_home_room" />
 
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/fragmentHomeRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragmentHomeRVrooms">
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/fragmentHomeRVdevices"
             android:layout_width="0dp"
@@ -54,17 +64,19 @@
             app:spanCount="2"
             tools:listitem="@layout/item_home_device" />
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Комната"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolBar" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Комната"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolBar" />
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
